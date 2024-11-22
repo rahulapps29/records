@@ -11,7 +11,9 @@ app.use(express.static(path.join(__dirname, "public")));
 // Proxy API route to fetch transaction data
 app.get("/api/data", async (req, res) => {
   try {
-    const response = await axios.get("http://localhost:4003/api/tasks/d");
+    const response = await axios.get(
+      "https://leger.rahulluthra.in/api/tasks/d"
+    );
     res.json(response.data);
   } catch (error) {
     console.error(error);
