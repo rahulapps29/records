@@ -8,12 +8,6 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="transactions.html">Transactions</a></li>
-      </ul>
-    </nav>
     <div class="container">
       <div class="header-container">
         <h4 id="grandtotal"></h4>
@@ -23,13 +17,14 @@
         <table>
           <thead>
             <tr>
-              <th>Month-Year</th>
-              <th>Total Gave</th>
-              <th>Total Got</th>
+              <th>Datetime</th>
+              <th>Description</th>
+              <th>Got</th>
+              <th>Gave</th>
               <th>Running Total</th>
             </tr>
           </thead>
-          <tbody id="table-body"></tbody>
+          <tbody id="transactionTable"></tbody>
         </table>
       </div>
     </div>

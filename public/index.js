@@ -16,54 +16,60 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   console.log(totalAmt);
 
+  // Update grand total
   function grandtotal() {
     document.getElementById(
       "grandtotal"
-    ).innerHTML = `Closing Bal: ${totalAmt} : Tran count: ${transactionCount} `;
+    ).innerHTML = `${name} : Closing Bal: ${totalAmt} : Tran count: ${transactionCount} `;
   }
   grandtotal();
 
-  // Parse transaction data by month
-  const monthlySummary = transactions.reduce((summary, transaction) => {
-    const date = new Date(transaction.TransactionDate);
-    const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}`;
+  // Sort transactions by date (ascending)
+  transactions.sort(
+    (a, b) => new Date(a.TransactionDate) - new Date(b.TransactionDate)
+  );
 
-    if (!summary[monthYear]) {
-      summary[monthYear] = { gave: 0, got: 0 };
-    }
-
-    if (transaction.DebitCredit === "gave") {
-      summary[monthYear].gave += transaction.Amt;
-    } else if (transaction.DebitCredit === "got") {
-      summary[monthYear].got += transaction.Amt;
-    }
-
-    return summary;
-  }, {});
-
-  // Sort by month and calculate running total
+  // Populate table rows in batches
+  const transactionTable = document.getElementById("transactionTable");
   let runningTotal = 0;
-  const monthlySummaryArray = Object.entries(monthlySummary)
-    .sort(([a], [b]) => new Date(a) - new Date(b))
-    .map(([monthYear, { gave, got }]) => {
-      const netChange = gave + got;
-      runningTotal += netChange;
-      return { monthYear, gave, got, runningTotal };
-    });
+  const batchSize = 20; // Number of rows per batch
+  const delay = 50; // Delay between batches in milliseconds
 
-  // Populate the table
-  const tableBody = document.getElementById("table-body");
-  monthlySummaryArray.forEach(({ monthYear, gave, got, runningTotal }) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-    <td>${monthYear}</td>
-    <td>${gave.toLocaleString()}</td>
-    <td>${got.toLocaleString()}</td>
-    <td>${runningTotal.toLocaleString()}</td>`;
-    tableBody.appendChild(row);
-  });
+  function populateBatch(startIndex) {
+    const fragment = document.createDocumentFragment();
+    for (
+      let i = startIndex;
+      i < startIndex + batchSize && i < transactions.length;
+      i++
+    ) {
+      const transaction = transactions[i];
+      runningTotal += transaction.Amt;
+
+      // Determine 'gave' and 'got' fields
+      const gave = transaction.DebitCredit === "gave" ? transaction.Amt : "";
+      const got = transaction.DebitCredit === "got" ? transaction.Amt : "";
+
+      // Create table row
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${new Date(transaction.TransactionDate).toLocaleString()}</td>
+        <td>${transaction.TransactionDescription}</td>
+        <td>${gave}</td>
+        <td>${got}</td>
+        <td>${runningTotal}</td>
+      `;
+      fragment.appendChild(row);
+    }
+    transactionTable.appendChild(fragment);
+
+    // Schedule the next batch if there are more rows
+    if (startIndex + batchSize < transactions.length) {
+      setTimeout(() => populateBatch(startIndex + batchSize), delay);
+    }
+  }
+
+  // Start populating the table
+  populateBatch(0);
 });
 
 const toggleButton = document.getElementById("mode-toggle");
