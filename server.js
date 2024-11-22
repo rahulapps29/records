@@ -19,7 +19,7 @@ app.get("/api/data/:name?", async (req, res) => {
 
   try {
     // If the 'name' filter is provided, proceed with fetching data
-    const apiUrl = `http://localhost:4003/api/tasks/d?name=${encodeURIComponent(
+    const apiUrl = `https://leger.rahulluthra.in/api/tasks/d?name=${encodeURIComponent(
       name
     )}`;
     const response = await axios.get(apiUrl);
@@ -35,11 +35,9 @@ app.get("/api/data/:name?", async (req, res) => {
 // Catch-all route for any invalid pages like '/'
 // This will return a custom error or redirect the user
 app.get("/", (req, res) => {
-  res
-    .status(404)
-    .json({
-      error: "Invalid request, please specify a valid filter like /?name=rovin",
-    });
+  res.status(404).json({
+    error: "Invalid request, please specify a valid filter like /?name=rovin",
+  });
 });
 
 // Serve the index.html file for any other route
